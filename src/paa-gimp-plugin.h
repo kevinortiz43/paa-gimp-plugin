@@ -16,19 +16,35 @@
 #define SAVE_PROC "file-paa-save"
 #define LOAD_PAA_ERROR -1
 #define LOAD_PAA_CANCEL -2
+#define SAVE_PAA_ERROR -3
 
 namespace fs = std::filesystem;
 
-static void query (void);
-static void run (const gchar *name, gint nparams, const GimpParam  *param, gint *nreturn_vals, GimpParam **return_vals);
-
-gint32 loadPaa(const gchar* filename, int interactive);
-gboolean savePaa (const gchar *filename, gint32 imageId, gint32 drawableId, GError **error);
-
-const GimpPlugInInfo PLUG_IN_INFO =
+struct _PAA
 {
-    NULL,
-    NULL,
-    query,
-    run,
+    GimpPlugIn parent_instance;
 };
+
+G_DECLARE_FINAL_TYPE (PAA, paa, PAA,, GimpPlugIn)
+
+static GList*          paa_query_procedures (GimpPlugIn* plug_in);
+static GimpProcedure*  paa_create_procedure (GimpPlugIn* plug_in,
+                                             const gchar* name);
+static GimpValueArray* paa_load             (GimpProcedure* procedure,
+                                             GimpRunMode run_mode,
+                                             GFile* file,
+                                             GimpMetadata* metadata,
+                                             GimpMetadataLoadFlags* flags,
+                                             GimpProcedureConfig* config,
+                                             gpointer run_data);
+static GimpValueArray* paa_save             (GimpProcedure* procedure,
+                                             GimpRunMode run_mode,
+                                             GimpImage* image,
+                                             GFile* file,
+                                             GimpExportOptions* options,
+                                             GimpMetadata* metadata,
+                                             GimpProcedureConfig* config,
+                                             gpointer run_data);
+static GimpValueArray* savePaa              (GimpProcedure* procedure,
+                                             const gchar *filename,
+                                             GimpDrawable* drawable);
